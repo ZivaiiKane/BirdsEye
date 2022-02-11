@@ -1,3 +1,8 @@
+$yellow: hsl(40, 100%, 67%);
+$green: hsl(183, 81%, 35%);
+$blue: hsl(195, 67%, 30%);
+$main: hsl(255, 100%, 100%);
+
 * {
   font-family: "Roboto", sans-serif;
 }
@@ -5,4 +10,48 @@
 body {
   padding: 0;
   margin: 0;
+}
+
+.topnav {
+  width: 100%;
+  height: 4rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  z-index: 999;
+  background-color: #fff;
+
+  .logo {
+    width: 4rem;
+    height: 4rem;
+    text-align: center;
+    color: var(--nav-bar);
+
+    i {
+      margin-top: 34px;
+    }
+  }
+
+  h1 {
+    color: var(--nav-bar);
+    font-style: italic;
+  }
+}
+
+.map__card {
+  width: 100%;
+  height: 25rem;
+  position: absolute;
+  left: 0;
+}
+
+main {
+  display: grid;
+  gap: 1.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 600px));
+  justify-content: center;
+  padding: 26rem 1rem 0 1rem;
+  margin-top: 4rem;
 }

@@ -14,6 +14,7 @@
     "snowpack": "^3.8.8"
   },
   "dependencies": {
-    "@snowpack/plugin-sass": "^1.4.0"
+    "@snowpack/plugin-sass": "^1.4.0",
+    "leaflet": "^1.7.1"
   }
 }
