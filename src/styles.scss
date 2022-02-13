@@ -17,6 +17,7 @@ body {
   top: 0;
   z-index: 999;
   background-color: #fff;
+  color: #1b2239;
 
   .logo {
     width: 4rem;
@@ -45,6 +46,6 @@ main {
   gap: 1.75rem;
   grid-template-columns: repeat(auto-fit, minmax(250px, 350px));
   justify-content: center;
-  padding: 26rem 1rem 0 1rem;
+  padding: 28rem 1rem 0 1rem;
   margin-top: 4rem;
 }
