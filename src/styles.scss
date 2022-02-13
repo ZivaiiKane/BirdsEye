@@ -1,8 +1,3 @@
-$yellow: hsl(40, 100%, 67%);
-$green: hsl(183, 81%, 35%);
-$blue: hsl(195, 67%, 30%);
-$main: hsl(255, 100%, 100%);
-
 * {
   font-family: "Roboto", sans-serif;
 }
@@ -27,7 +22,6 @@ body {
     width: 4rem;
     height: 4rem;
     text-align: center;
-    color: var(--nav-bar);
 
     i {
       margin-top: 34px;
@@ -35,7 +29,6 @@ body {
   }
 
   h1 {
-    color: var(--nav-bar);
     font-style: italic;
   }
 }
@@ -50,7 +43,7 @@ body {
 main {
   display: grid;
   gap: 1.75rem;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 600px));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 350px));
   justify-content: center;
   padding: 26rem 1rem 0 1rem;
   margin-top: 4rem;
