@@ -8,7 +8,9 @@ const flightsContainer = document.getElementById("flights");
 let cardHTML = "";
 
 flightsData.forEach((flight) => {
-  cardHTML += `<flight-card flight="${flight.callsign}"></flight-card>`;
+  if (flight.estDepartureAirport && flight.estArrivalAirport) {
+    cardHTML += `<flight-card flight="${flight.callsign}" info="Flight from ${flight.estDepartureAirport} airport to ${flight.estArrivalAirport} airport."></flight-card>`;
+  }
 });
 
 flightsContainer.innerHTML = cardHTML;

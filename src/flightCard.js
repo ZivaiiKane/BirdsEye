@@ -1,4 +1,10 @@
+import axios from "axios";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import { mapDom } from "./map";
+
 const template = document.createElement("template");
+let airports = [];
 
 template.innerHTML = `
     <style>
@@ -96,9 +102,93 @@ class FlightCard extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.shadowRoot.querySelector("h3").innerText = this.getAttribute("flight");
+    this.shadowRoot.querySelector("#info").innerText =
+      this.getAttribute("info");
+  }
+
+  getAirports() {
+    let info = this.shadowRoot.querySelector("#info").innerText.split(" ");
+
+    let codes = [];
+    codes.push(info[2]);
+    codes.push(info[5]);
+
+    codes.forEach((port) => {
+      const options = {
+        method: "GET",
+        url: "https://airport-info.p.rapidapi.com/airport",
+        params: { icao: `${port}` },
+        headers: {
+          "x-rapidapi-host": "airport-info.p.rapidapi.com",
+          "x-rapidapi-key":
+            "23747a9954msh9d6a7e764b48650p1080d5jsnc6b4ea342070",
+        },
+      };
+
+      axios
+        .request(options)
+        .then(function (response) {
+          if (airports.length < 2) {
+            airports.push(response.data);
+          } else {
+            airports = [];
+            airports.push(response.data);
+          }
+        })
+        .catch(function (error) {
+          console.error(error);
+        });
+    });
+
+    window.scrollTo(0, 0);
+  }
+
+  setPoints(airports) {
+    let pointA = L.circle([airports[0].latitude, airports[0].longitude], {
+      color: "#ffd300",
+      fillColor: "#ffd300",
+      fillOpacity: 0.3,
+      radius: 800,
+    }).addTo(mapDom);
+
+    pointA.bindPopup(`Departure: ${airports[0].name}`);
+
+    let pointB = L.circle([airports[1].latitude, airports[1].longitude], {
+      color: "#ffd300",
+      fillColor: "#ffd300",
+      fillOpacity: 0.3,
+      radius: 800,
+    }).addTo(mapDom);
+
+    let latlngs = [
+      [airports[0].latitude, airports[0].longitude],
+      [airports[1].latitude, airports[1].longitude],
+    ];
+
+    pointB.bindPopup(`Arrival: ${airports[1].name}`);
+
+    let polyline = L.polyline(latlngs, { color: "#ffd300" }).addTo(mapDom);
+
+    mapDom.fitBounds(polyline.getBounds());
+
+    // mapDom.setView([airports[0].latitude, airports[0].longitude], 4);
+  }
+
+  connectedCallback() {
+    this.shadowRoot.querySelector(".btnTrack").addEventListener("click", () => {
+      this.getAirports();
+      setTimeout(() => {
+        this.setPoints(airports);
+      }, 4000);
+      console.log("Test: ", airports);
+    });
+  }
+
+  disconnectedCallback() {
+    this.shadowRoot.querySelector(".btnTrack").removeEventListener();
   }
 }
 
 window.customElements.define("flight-card", FlightCard);
 
-export { FlightCard };
+export { FlightCard, airports };
