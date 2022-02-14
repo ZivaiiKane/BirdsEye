@@ -2,6 +2,7 @@ import axios from "axios";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { mapDom } from "./map";
+import { config } from "./config";
 
 const template = document.createElement("template");
 let airports = [];
@@ -120,8 +121,7 @@ class FlightCard extends HTMLElement {
         params: { icao: `${port}` },
         headers: {
           "x-rapidapi-host": "airport-info.p.rapidapi.com",
-          "x-rapidapi-key":
-            "23747a9954msh9d6a7e764b48650p1080d5jsnc6b4ea342070",
+          "x-rapidapi-key": `${config.MY_API_TOKEN}`,
         },
       };
 
