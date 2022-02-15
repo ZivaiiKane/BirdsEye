@@ -49,3 +49,12 @@ main {
   padding: 28rem 1rem 0 1rem;
   margin: 4rem 0;
 }
+
+flight-card {
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+
+flight-card[selected="true"] {
+  transform: translate(4px, -4px);
+  box-shadow: -8px 8px 0 #10162f;
+}

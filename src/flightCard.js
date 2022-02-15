@@ -9,71 +9,80 @@ let airports = [];
 
 template.innerHTML = `
     <style>
-    :root {
-    --inflight: #3388ff;
-    --landed: #2daaa6;
-    }
+      :root {
+        --inflight: #3388ff;
+        --landed: #2daaa6;
+      }
 
-    .card {
-    display: grid;
-    min-height: 11.25rem;
-    grid-template-rows: repeat(3, max-content) 1fr max-content;
-    width: calc(100% - 2rem);
-    padding: 1rem;
-    border: solid 1.5px #1b2239;
-    transition: box-shadow 200ms ease, transform 200ms ease;
-    box-shadow: 0px 0px 0 #10162f;
-    }
+      .card {
+        display: grid;
+        min-height: 11.25rem;
+        grid-template-rows: repeat(3, max-content) 1fr max-content;
+        width: calc(100% - 2rem);
+        padding: 1rem;
+        border: solid 1.5px #1b2239;
+        transition: box-shadow 200ms ease, transform 200ms ease;
+        box-shadow: 0px 0px 0 #10162f;
+      }
 
-    .card:hover {
-    transform: translate(4px, -4px);
-    box-shadow: -8px 8px 0 #10162f;
-    }
+      .card:hover {
+        transform: translate(4px, -4px);
+        box-shadow: -8px 8px 0 #10162f;
+      }
 
-    .card > span {
-    display: flex;
-    text-transform: capitalize;
-    margin-bottom: 0.75rem;
-    }
+      .card > span {
+        display: flex;
+        text-transform: capitalize;
+        margin-bottom: 0.75rem;
+      }
 
-    .card > h3 {
-    font-weight: 700;
-    line-height: 1.1;
-    margin: 0;
-    margin-bottom: 0px;
-    font-size: 1.25rem;
-    margin-bottom: 0.25rem;
-    }
+      .card > h3 {
+        font-weight: 700;
+        line-height: 1.1;
+        margin: 0;
+        margin-bottom: 0px;
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+      }
 
-    .card > div {
-    padding: 0.5rem 0 0 0;
-    }
+      .card > div {
+        padding: 0.5rem 0 0 0;
+      }
 
-    #info {
-    margin: 0.5rem 0 0 0;
-    }
+      #info {
+        margin: 0.5rem 0 0 0;
+      }
 
-    .card .btnTrack {
-    width: 5rem;
-    text-align: center;
-    background-color: #ffd300;
-    padding: 0.5rem;
-    font-weight: 400;
-    transition: box-shadow 200ms ease, transform 200ms ease;
-    box-shadow: 0px 0px 0 #10162f;
-    cursor: pointer;
-    }
+      .card .btnTrack {
+        width: 5rem;
+        text-align: center;
+        background-color: #ffd300;
+        padding: 0.5rem;
+        font-weight: 400;
+        transition: box-shadow 200ms ease, transform 200ms ease;
+        box-shadow: 0px 0px 0 #10162f;
+        cursor: pointer;
+      }
 
-    .card .btnTrack:hover {
-    transform: translate(4px, -4px);
-    box-shadow: -8px 8px 0 #10162f;
-    }
+      .card .btnTrack:hover {
+        transform: translate(4px, -4px);
+        box-shadow: -8px 8px 0 #10162f;
+      }
+      
+      .card .btnTrack[selected=true] {
+        transform: translate(4px, -4px);
+        box-shadow: -8px 8px 0 #10162f;
+      }
 
-    #status {
-    color: #2daaa6;
-    font-weight: 400;
-    margin-left: 5px;
-    }
+      .card .btnTrack:active {
+        background-color: rgba(255,211,0, 0.8)
+      }
+
+      #status {
+        color: #2daaa6;
+        font-weight: 400;
+        margin-left: 5px;
+      }
     </style>
 
     <div class="card">
@@ -97,6 +106,8 @@ template.innerHTML = `
 `;
 
 class FlightCard extends HTMLElement {
+  selectFlightCallback;
+
   constructor() {
     super();
 
@@ -105,14 +116,25 @@ class FlightCard extends HTMLElement {
     this.shadowRoot.querySelector("h3").innerText = this.getAttribute("flight");
     this.shadowRoot.querySelector("#info").innerText =
       this.getAttribute("info");
+
+    this.shadowRoot.querySelector(".btnTrack").addEventListener("click", () => {
+      this.getAirports();
+      if (this.selectFlightCallback instanceof Function) {
+        this.selectFlightCallback();
+      }
+      console.log("Test: ", airports);
+    });
   }
 
   getAirports() {
-    let info = this.shadowRoot.querySelector("#info").innerText.split(" ");
+    const info = this.shadowRoot.querySelector("#info").innerText.split(" ");
 
-    let codes = [];
-    codes.push(info[2]);
-    codes.push(info[5]);
+    const codes = [];
+
+    if (!!info[2] && !!info[5]) {
+      codes.push(info[2]);
+      codes.push(info[5]);
+    }
 
     codes.forEach((port) => {
       const options = {
@@ -127,61 +149,71 @@ class FlightCard extends HTMLElement {
 
       axios
         .request(options)
-        .then(function (response) {
+        .then((response) => {
           if (airports.length < 2) {
             airports.push(response.data);
           } else {
             airports = [];
             airports.push(response.data);
           }
+
+          this.setPoints(airports);
         })
         .catch(function (error) {
           console.error(error);
         });
     });
 
-    window.scrollTo(0, 0);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   }
 
   setPoints(airports) {
-    let pointA = L.circle([airports[0].latitude, airports[0].longitude], {
-      color: "#ffd300",
-      fillColor: "#ffd300",
-      fillOpacity: 0.3,
-      radius: 800,
-    }).addTo(mapDom);
+    if (airports?.length !== 2) {
+      // mapDom.eachLayer((layer) => mapDom.removeLayer(layer));
+      // mapDom.invalidateSize();
+      return;
+    }
 
-    pointA.bindPopup(`Departure: ${airports[0].name}`);
+    if (
+      !!airports[0].latitude &&
+      !!airports[0].longitude &&
+      !!airports[1].latitude &&
+      !!airports[1].longitude
+    ) {
+      let pointA = L.circle([airports[0]?.latitude, airports[0]?.longitude], {
+        color: "#ffd300",
+        fillColor: "#ffd300",
+        fillOpacity: 0.3,
+        radius: 800,
+      }).addTo(mapDom);
 
-    let pointB = L.circle([airports[1].latitude, airports[1].longitude], {
-      color: "#ffd300",
-      fillColor: "#ffd300",
-      fillOpacity: 0.3,
-      radius: 800,
-    }).addTo(mapDom);
+      pointA.bindPopup(`Departure: ${airports[0].name}`);
 
-    let latlngs = [
-      [airports[0].latitude, airports[0].longitude],
-      [airports[1].latitude, airports[1].longitude],
-    ];
+      let pointB = L.circle([airports[1]?.latitude, airports[1]?.longitude], {
+        color: "#ffd300",
+        fillColor: "#ffd300",
+        fillOpacity: 0.3,
+        radius: 800,
+      }).addTo(mapDom);
 
-    pointB.bindPopup(`Arrival: ${airports[1].name}`);
+      let latlngs = [
+        [airports[0]?.latitude, airports[0].longitude],
+        [airports[1]?.latitude, airports[1].longitude],
+      ];
 
-    let polyline = L.polyline(latlngs, { color: "#ffd300" }).addTo(mapDom);
+      pointB.bindPopup(`Arrival: ${airports[1].name}`);
 
-    mapDom.fitBounds(polyline.getBounds());
+      let polyline = L.polyline(latlngs, { color: "#ffd300" }).addTo(mapDom);
 
-    // mapDom.setView([airports[0].latitude, airports[0].longitude], 4);
-  }
-
-  connectedCallback() {
-    this.shadowRoot.querySelector(".btnTrack").addEventListener("click", () => {
-      this.getAirports();
-      setTimeout(() => {
-        this.setPoints(airports);
-      }, 4000);
-      console.log("Test: ", airports);
-    });
+      mapDom.fitBounds(polyline.getBounds());
+    } else {
+      alert(
+        "This flights departure aiport and arrival airport could not be found. Please select a diffrent flight."
+      );
+    }
   }
 
   disconnectedCallback() {
