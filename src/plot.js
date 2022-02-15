@@ -1,1 +1,0 @@
-import airports from "./flightCard";
